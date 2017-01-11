@@ -1,0 +1,17 @@
+<!doctype HTML>
+<html>
+<head>
+  <script type="text/javascript" src="pane.js"></script>
+  <script type="text/javascript" src="pane-resize.js"></script>
+  <script type="text/javascript" src="pane-split-merge.js"></script>
+  <script type="text/javascript">
+    window.addEventListener('load', function () {
+      console.debug('load!');
+      var pane = new Pane();
+    });
+  </script>
+</head>
+<body>
+  <div id="jspane" style="width:500px;height:500px;"></div>
+</body>
+</html>
