@@ -1,1 +1,3 @@
 # jspane
+
+Resizable pane system
