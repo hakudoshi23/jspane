@@ -18,13 +18,15 @@ $SEPARATOR_BG: #FF8800;
         width: $ANCHOR_SIZE;
 
         position: absolute;
+        bottom: 0;
         right: 0;
-        top: 0;
     }
 }
 
 .pane-separator {
     background-color: $SEPARATOR_BG;
+    height: 100%;
+    width: 100%;
     user-select: none;
     display: block;
     float: left;
