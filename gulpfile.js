@@ -90,7 +90,7 @@ gulp.task('demo', function () {
         .pipe(plugins.webserver({
           livereload: true,
           directoryListing: true,
-          open: 'demo/index.html'
+          open: 'docs/index.html'
         }));
 });
 

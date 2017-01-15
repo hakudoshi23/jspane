@@ -4,14 +4,16 @@
     var defaultOptions = {
         container: '#jspane',
         anchor: {
-            treshhold: 10
+            treshhold: 20
         },
         separator: {
             size: 5
         },
-        events: {
+        callbacks: {
             onPaneCreate: null,
-            onPaneResized: null,
+            onPaneSplit: null,
+            onPaneResize: null,
+            onPaneMerge: null,
             onPaneDestroy: null,
         }
     };
@@ -20,7 +22,8 @@
         this.fn = Pane.prototype;
         var self = this;
 
-        this.options = extend(defaultOptions, options);
+        this.options = defaultOptions;
+        extend(defaultOptions, options);
 
         var containerId = this.options.container;
         this.container = document.querySelector(containerId);
@@ -92,8 +95,7 @@
             self.setDimensions(pane, currentPaneDimensions);
             self.setDimensions(newPane, newPaneDimensions);
             self.updateGroupDimensions(group);
-
-            runCallback(self.options.events.onPaneCreate, newPane);
+            runCallback(self, 'onPaneSplit', pane, newPane);
         };
 
         this.merge = function (pane, axis) {
@@ -101,7 +103,8 @@
                 var group = pane.parentNode;
                 if (group.dataset.axis === axis) {
                     var toRemove = pane.nextSibling.nextSibling;
-                    runCallback(self.options.events.onPaneDestroy, toRemove);
+                    runCallback(self, 'onPaneMerge', pane, toRemove);
+                    runCallback(self, 'onPaneDestroy', toRemove);
 
                     var paneDimensions = self.getDimensions(pane);
                     var toRemoveDimensions = self.getDimensions(toRemove);
@@ -122,9 +125,9 @@
         function createPane () {
             var pane = document.createElement('div');
             pane.className = 'pane';
-            self.setDimensions(pane, [100, 100]);
             pane.append(createAnchor(onAnchorMouseDown));
-            runCallback(self.options.events.onPaneCreate);
+            runCallback(self, 'onPaneCreate', pane);
+            self.setDimensions(pane, [100, 100]);
             return pane;
         }
 
@@ -161,6 +164,7 @@
         if (group === null) {
             pane.style.width = 'calc(100% - 0px)';
             pane.style.height = 'calc(100% - 0px)';
+            runCallback(this, 'onPaneResize', pane);
         } else {
             var panes = this.getPanes(group);
             var sepSize = this.getSeparatorsSize(group);
@@ -169,8 +173,13 @@
             var subSize = [0, 0];
             if (panes.length > 0)
                 subSize[axisToIndex(axis)] = (sepSize / panes.length);
-            pane.style.width = 'calc(' + dimensions[0] + '% - ' + subSize[0] + 'px)';
-            pane.style.height = 'calc(' + dimensions[1] + '% - ' + subSize[1] + 'px)';
+            var newWidth = 'calc(' + dimensions[0] + '% - ' + subSize[0] + 'px)';
+            var newHeight = 'calc(' + dimensions[1] + '% - ' + subSize[1] + 'px)';
+            var isChanged = (pane.style.width != newWidth) ||
+                (pane.style.height != newHeight);
+            pane.style.width = newWidth;
+            pane.style.height = newHeight;
+            if (isChanged) runCallback(this, 'onPaneResize', pane);
         }
     };
 
@@ -287,26 +296,20 @@
     }
 
     function updateAnchorFeedback (anchor, delta, treshhold) {
-        var feedbackColor = getAnchorFeedbackColor(delta, treshhold);
-        anchor.style.backgroundColor = feedbackColor;
-    }
-
-    function getAnchorFeedbackColor (delta, treshhold) {
-        switch (getAnchorAction(delta, treshhold)) {
-            case 'left': return '#000000';
-            case 'right': return '#FF0000';
-            case 'up': return '#00FF00';
-            case 'down': return '#0000FF';
-            default: return '';
-        }
+        var action = getAnchorAction(delta, treshhold);
+        anchor.className = 'pane-anchor';
+        if (action) anchor.className += ' action-' + action;
     }
 
     function getAnchorAction (delta, treshhold) {
-        if (delta[0] > +treshhold) return 'left';
-        if (delta[0] < -treshhold) return 'right';
-        if (delta[1] > +treshhold) return 'up';
-        if (delta[1] < -treshhold) return 'down';
-        return '';
+        if (delta[0] > treshhold || delta[1] > treshhold) {
+            var a = delta[0] >= delta[1];
+            var b = delta[0] >= -delta[1];
+            if (a && b) return 'left';
+            if (!a && !b) return 'right';
+            if (!a && b) return 'up';
+            if (a && !b) return 'down';
+        } else return '';
     }
 
     function updateSeparatorPanes (self, separator, axis) {
@@ -324,8 +327,12 @@
         self.setDimensions(pane2, pane2Dimensions);
     }
 
-    function runCallback (callback) {
-        if (callback) callback();
+    function runCallback (self, callbackName) {
+        var callback = self.options.callbacks[callbackName];
+        if (callback) {
+            var args = Array.prototype.slice.call(arguments, 2);
+            callback.apply(null, args);
+        }
     }
 
     function getElementCenter (element) {
@@ -350,16 +357,14 @@
         else if (axis === 'height') return 1;
     }
 
-    function extend (properties, defaults) {
-        properties = properties || {};
-        for (var p in defaults)
-          if (defaults.hasOwnProperty(p) && !properties[p]) {
-              var value = defaults[p];
-              if (typeof value === 'object')
-                  extend(properties[p], defaults[p]);
-              else
-                  properties[p] = defaults[p];
-          }
-        return properties;
+    function extend (defaults, properties) {
+        for (var property in properties)
+            if (property && properties.hasOwnProperty(property)) {
+                var value = properties[property];
+                if (typeof value === 'object')
+                    extend(defaults[property], properties[property]);
+                else
+                    defaults[property] = properties[property];
+            }
     }
 })();

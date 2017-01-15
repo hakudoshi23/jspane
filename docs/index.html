@@ -1,0 +1,35 @@
+<!doctype HTML>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="../dist/jspane.min.css">
+    <script type="text/javascript" src="../dist/jspane.min.js"></script>
+    <script type="text/javascript">
+        var pane = null;
+        window.addEventListener('load', function () {
+            pane = new Pane({
+                container: '#jspane2',
+                callbacks: {
+                    onPaneCreate: function (pane) {
+                        console.debug('onPaneCreate', pane);
+                    },
+                    onPaneSplit: function (pane1, pane2) {
+                        console.debug('onPaneSplit', pane1, pane2);
+                    },
+                    onPaneResize: function (pane) {
+                        console.debug('onPaneResize', pane);
+                    },
+                    onPaneMerge: function (pane1, pane2) {
+                        console.debug('onPaneMerge', pane1, pane2);
+                    },
+                    onPaneDestroy: function (pane) {
+                        console.debug('onPaneDestroy', pane);
+                    },
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div id="jspane2" style="width:700px;height:700px;"></div>
+</body>
+</html>
