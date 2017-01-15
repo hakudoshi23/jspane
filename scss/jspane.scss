@@ -21,6 +21,22 @@ $SEPARATOR_BG: #FF8800;
         bottom: 0;
         right: 0;
     }
+
+    .action-left {
+        background-color: #000000;
+    }
+
+    .action-right {
+        background-color: #FF0000;
+    }
+
+    .action-up {
+        background-color: #00FF00;
+    }
+
+    .action-down {
+        background-color: #0000FF;
+    }
 }
 
 .pane-separator {

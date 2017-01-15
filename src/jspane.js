@@ -73,6 +73,9 @@
                     case 'up': self.split(pane, 'height'); break;
                     case 'down': self.merge(pane, 'height'); break;
                 }
+                var actionRemoved = anchor.className.replace(/\s+action-\w*/, '');
+                anchor.dataset.delta = JSON.stringify([0, 0]);
+                anchor.className = actionRemoved;
 
                 self.current.anchor = null;
             }
@@ -297,14 +300,16 @@
 
     function updateAnchorFeedback (anchor, delta, treshhold) {
         var action = getAnchorAction(delta, treshhold);
-        anchor.className = 'pane-anchor';
+        anchor.className = anchor.className.replace(/\s+action-\w*/, '');
         if (action) anchor.className += ' action-' + action;
     }
 
     function getAnchorAction (delta, treshhold) {
-        if (delta[0] > treshhold || delta[1] > treshhold) {
+        if (delta[0] > treshhold || delta[1] > treshhold ||
+            delta[0] < -treshhold || delta[1] < -treshhold) {
             var a = delta[0] >= delta[1];
             var b = delta[0] >= -delta[1];
+            console.debug(a, b);
             if (a && b) return 'left';
             if (!a && !b) return 'right';
             if (!a && b) return 'up';
