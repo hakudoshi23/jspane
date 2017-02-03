@@ -182,7 +182,15 @@
                 (pane.style.height != newHeight);
             pane.style.width = newWidth;
             pane.style.height = newHeight;
-            if (isChanged) runCallback(this, 'onPaneResize', pane);
+
+            if (isChanged) {
+                runCallback(this, 'onPaneResize', pane);
+                if (pane.className.indexOf('pane-group') > -1) {
+                    var subPanes = this.getAllPanes(pane);
+                    for (var i = 0; i < subPanes.length; i++)
+                        runCallback(this, 'onPaneResize', subPanes[i]);
+                }
+            }
         }
     };
 
@@ -211,6 +219,10 @@
 
     Pane.prototype.getPanes = function (group) {
         return group.querySelectorAll(':scope > .pane');
+    };
+
+    Pane.prototype.getAllPanes = function (group) {
+        return group.querySelectorAll('.pane');
     };
 
     Pane.prototype.getSeparators = function (group) {
@@ -309,7 +321,6 @@
             delta[0] < -treshhold || delta[1] < -treshhold) {
             var a = delta[0] >= delta[1];
             var b = delta[0] >= -delta[1];
-            console.debug(a, b);
             if (a && b) return 'left';
             if (!a && !b) return 'right';
             if (!a && b) return 'up';
