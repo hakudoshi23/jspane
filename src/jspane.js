@@ -35,6 +35,7 @@
 
         var rootPane = createPane();
         this.container.append(rootPane);
+        runCallback(self, 'onPaneCreate', rootPane);
 
         document.addEventListener('mousemove', function (event) {
             var delta = 0;
@@ -98,6 +99,7 @@
             self.setDimensions(pane, currentPaneDimensions);
             self.setDimensions(newPane, newPaneDimensions);
             self.updateGroupDimensions(group);
+            runCallback(self, 'onPaneCreate', newPane);
             runCallback(self, 'onPaneSplit', pane, newPane);
         };
 
@@ -129,7 +131,6 @@
             var pane = document.createElement('div');
             pane.className = 'pane';
             pane.append(createAnchor(onAnchorMouseDown));
-            runCallback(self, 'onPaneCreate', pane);
             self.setDimensions(pane, [100, 100]);
             return pane;
         }
