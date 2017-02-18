@@ -34,7 +34,7 @@
         };
 
         var rootPane = createPane();
-        this.container.append(rootPane);
+        this.container.appendChild(rootPane);
         runCallback(self, 'onPaneCreate', rootPane);
 
         document.addEventListener('mousemove', function (event) {
@@ -130,7 +130,7 @@
         function createPane () {
             var pane = document.createElement('div');
             pane.className = 'pane';
-            pane.append(createAnchor(onAnchorMouseDown));
+            pane.appendChild(createAnchor(onAnchorMouseDown));
             self.setDimensions(pane, [100, 100]);
             return pane;
         }
@@ -219,7 +219,13 @@
     };
 
     Pane.prototype.getPanes = function (group) {
-        return group.querySelectorAll(':scope > .pane');
+        var output = [], children = group.children;
+        for (var i = 0; i < children.length; i++) {
+            if (children[i].classList.contains('pane')) {
+                output.push(children[i]);
+            }
+        }
+        return output;
     };
 
     Pane.prototype.getAllPanes = function (group) {
@@ -227,7 +233,13 @@
     };
 
     Pane.prototype.getSeparators = function (group) {
-        return group.querySelectorAll(':scope > .pane-separator');
+        var output = [], children = group.children;
+        for (var i = 0; i < children.length; i++) {
+            if (children[i].classList.contains('pane-separator')) {
+                output.push(children[i]);
+            }
+        }
+        return output;
     };
 
     Pane.prototype.getSeparatorsSize = function (group) {
@@ -274,7 +286,7 @@
         if (!isGroup || !hasRightAxis) {
             group = createGroup(axis);
             replaceElement(pane, group);
-            group.append(pane);
+            group.appendChild(pane);
             self.setDimensions(group, self.getDimensions(pane));
             self.setDimensions(pane, [100, 100]);
         }
