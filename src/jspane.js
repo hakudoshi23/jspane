@@ -138,10 +138,8 @@
         function createSeparator (size, axis) {
             var separator = document.createElement('div');
             separator.addEventListener('mousedown', onSeparatorMouseDown);
-            var arrow = axisToIndex(axis) ? 'ns' : 'ew';
-            separator.style.cursor = arrow + '-resize';
-            separator.className = 'pane-separator';
-            separator.style[axis] = size + 'px';
+            var axisLetter = axisToIndex(axis) ? 'h' : 'v';
+            separator.className = 'pane-separator pane-separator-' + axisLetter;
             return separator;
         }
 

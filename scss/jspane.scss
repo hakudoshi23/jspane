@@ -2,6 +2,7 @@ $PANE_BG: #DDDDDD;
 $ANCHOR_BG: #0000AA;
 $ANCHOR_SIZE: 15px;
 $SEPARATOR_BG: #FF8800;
+$SEPARATOR_SIZE: 4px;
 
 .pane {
     background-color: $PANE_BG;
@@ -46,6 +47,18 @@ $SEPARATOR_BG: #FF8800;
     user-select: none;
     display: block;
     float: left;
+}
+
+.pane-group > .pane-separator-h {
+    width: 100%;
+    height: $SEPARATOR_SIZE;
+    cursor: ns-resize;
+}
+
+.pane-group > .pane-separator-v {
+    width: $SEPARATOR_SIZE;
+    height: 100%;
+    cursor: ew-resize;
 }
 
 .pane-group {
